@@ -17,7 +17,8 @@ sample_image = skimage.io.imread(str(sample_path))
 
 stage = Stage(x=0, y=0)
 camera = Camera(
-    width=1000, height=1000, scale=1.0, image=sample_image, stage=stage
+    width=1000, height=1000, scale=1.0, image=sample_image, noise_std=50,
+    stage=stage
 )
 
 roi_width = camera.width * 3

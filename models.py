@@ -33,6 +33,7 @@ class Camera:
     scale = attr.ib(validator=v_float)
     image = attr.ib(validator=v_array)
     stage = attr.ib(validator=attr.validators.instance_of(Stage))
+    noise_std = attr.ib(validator=v_float)
 
     @property
     def dtype(self):
@@ -80,7 +81,7 @@ class Camera:
         a = self.image[y1:y2, x1:x2]
         a = np.pad(a, padding, 'constant')
         assert a.shape == (self.height, self.width)
-        a = a + np.random.randn(*a.shape) * 50
+        a = a + np.random.randn(*a.shape) * self.noise_std
         a = a.clip(*self.dtype_range)
         if self.dtype_is_int:
             a = a.round()
