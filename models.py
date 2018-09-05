@@ -70,11 +70,11 @@ class Camera:
         if y1 < 0:
             pad_top = -y1
             y1 = 0
-        if x2 >= self.image.shape[1]:
-            pad_right = x2 - self.image.shape[1] + 1
+        if x2 > self.image.shape[1]:
+            pad_right = x2 - self.image.shape[1]
             x2 = self.image.shape[1]
-        if y2 >= self.image.shape[0]:
-            pad_right = y2 - self.image.shape[0] + 1
+        if y2 > self.image.shape[0]:
+            pad_bottom = y2 - self.image.shape[0]
             y2 = self.image.shape[0]
         padding = ((pad_top, pad_bottom), (pad_left, pad_right))
         a = self.image[y1:y2, x1:x2]
