@@ -1,6 +1,7 @@
 import numbers
 import attr
 import numpy as np
+import scipy.ndimage
 
 
 v_float = attr.validators.instance_of(numbers.Real)
@@ -44,7 +45,7 @@ class Camera:
         return np.issubdtype(self.dtype, np.integer)
 
     @property
-    def dtype_is_floatt(self):
+    def dtype_is_float(self):
         return np.issubdtype(self.dtype, np.floating)
 
     @property
@@ -60,10 +61,14 @@ class Camera:
     def acquire(self, position=None):
         if position is None:
             position = self.stage.position
-        lower = np.array(position) / self.scale
+        lower, lower_f = np.divmod(np.array(position) / self.scale, 1)
+        subpixel_shift = -lower_f[::-1]
+        lower = lower.astype(int)
         upper = lower + [self.width, self.height]
-        x1, y1 = np.floor(lower).astype(int)
-        x2, y2 = np.floor(upper).astype(int)
+        lower -= 1
+        upper += 1
+        x1, y1 = lower
+        x2, y2 = upper
         pad_left = pad_right = pad_top = pad_bottom = 0
         if x1 < 0:
             pad_left = -x1
@@ -80,6 +85,8 @@ class Camera:
         padding = ((pad_top, pad_bottom), (pad_left, pad_right))
         a = self.image[y1:y2, x1:x2]
         a = np.pad(a, padding, 'constant')
+        a = scipy.ndimage.shift(a, subpixel_shift)
+        a = a[1:-1, 1:-1]
         assert a.shape == (self.height, self.width)
         a = a + np.random.randn(*a.shape) * self.noise_std
         a = a.clip(*self.dtype_range)
