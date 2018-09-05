@@ -24,11 +24,14 @@ roi_width = camera.width * 3
 roi_height = camera.height * 2
 pitch = camera.width * 0.90
 
-positions = np.mgrid[0:roi_height:pitch, 0:roi_width:pitch].reshape(2,-1).T
-acquisitions = []
-for y, x in positions:
+positions = np.mgrid[0:roi_width:pitch, 0:roi_height:pitch].T.reshape(-1,2)
+num_positions = len(positions)
+acquisitions = [None] * num_positions
+true_positions = np.zeros((num_positions, 2))
+for i, (x, y) in enumerate(positions):
     stage.goto(x, y)
-    acquisitions.append(Acquisition(x, -y, camera.acquire()))
+    acquisitions[i] = Acquisition(x, -y, camera.acquire())
+    true_positions[i] = stage.position
 
 
 img_uuid = uuid.uuid4().urn
