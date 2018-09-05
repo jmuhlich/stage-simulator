@@ -39,11 +39,19 @@ class Camera:
         return self.image.dtype
 
     @property
+    def dtype_is_int(self):
+        return np.issubdtype(self.dtype, np.integer)
+
+    @property
+    def dtype_is_floatt(self):
+        return np.issubdtype(self.dtype, np.floating)
+
+    @property
     def dtype_range(self):
-        if np.issubdtype(self.dtype, np.integer):
+        if self.dtype_is_int:
             info = np.iinfo(self.dtype)
             return (info.min, info.max)
-        elif np.issubdtype(self.dtype, np.floating):
+        elif self.dtype_is_float:
             return (0, 1)
         else:
             raise ValueError("Unhandled dtype")
@@ -72,6 +80,11 @@ class Camera:
         a = self.image[y1:y2, x1:x2]
         a = np.pad(a, padding, 'constant')
         assert a.shape == (self.height, self.width)
+        a = a + np.random.randn(*a.shape) * 50
+        a = a.clip(*self.dtype_range)
+        if self.dtype_is_int:
+            a = a.round()
+        a = a.astype(self.dtype)
         return a
 
 
