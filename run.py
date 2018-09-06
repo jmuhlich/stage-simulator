@@ -17,15 +17,19 @@ sample_image = skimage.io.imread(str(sample_path))
 
 stage = Stage(x=0, y=0)
 camera = Camera(
-    width=1000, height=1000, scale=1.0, image=sample_image, noise_std=50,
+    width=800, height=800, scale=1.0, image=sample_image, noise_std=50,
     stage=stage
 )
 
+origin_x = 600
+origin_y = 0
 roi_width = camera.width * 3
 roi_height = camera.height * 2
-pitch = camera.width * 0.90
+pitch = int(camera.width * 0.90)
 
-positions = np.mgrid[0:roi_width:pitch, 0:roi_height:pitch].T.reshape(-1,2)
+slice_x = slice(origin_x, origin_x + roi_width, pitch)
+slice_y = slice(origin_y, origin_y + roi_height, pitch)
+positions = np.mgrid[slice_x, slice_y].T.reshape(-1,2)
 num_positions = len(positions)
 acquisitions = [None] * num_positions
 true_positions = np.zeros((num_positions, 2))
@@ -34,6 +38,8 @@ for i, (x, y) in enumerate(positions):
     acquisitions[i] = Acquisition(x, -y, camera.acquire())
     true_positions[i] = stage.position
 
+print("True stage positions:")
+print(np.array_str(true_positions, suppress_small=True))
 np.savetxt('true-positions.csv', true_positions, delimiter=',')
 
 img_uuid = uuid.uuid4().urn
