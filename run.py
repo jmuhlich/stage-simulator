@@ -8,7 +8,7 @@ from models import *
 
 
 sample_pathname = sys.argv[1]
-output_pathname = 'out.ome.tif'
+output_pathname = 'simulated-input.ome.tif'
 
 sample_path = pathlib.Path(sample_pathname).expanduser().resolve()
 output_path = pathlib.Path(output_pathname).expanduser().resolve()
@@ -34,6 +34,7 @@ for i, (x, y) in enumerate(positions):
     acquisitions[i] = Acquisition(x, -y, camera.acquire())
     true_positions[i] = stage.position
 
+np.savetxt('true-positions.csv', true_positions, delimiter=',')
 
 img_uuid = uuid.uuid4().urn
 xml = io.StringIO()
