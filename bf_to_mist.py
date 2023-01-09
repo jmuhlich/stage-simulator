@@ -15,7 +15,9 @@ output_base_path.mkdir(exist_ok=True)
 output_pattern = 'img_r{row:03}_c{col:03}.tif'
 
 reader = reg.BioformatsReader(str(input_path))
+reader.metadata._positions = np.round(reader.metadata.positions, -1)
 shape = reader.metadata.grid_dimensions
+print(f"Grid shape: {shape}")
 (y1, y2), (x1, x2) = [
     sorted(set(reader.metadata.positions[:, d]))[:2] for d in (0, 1)
 ]
