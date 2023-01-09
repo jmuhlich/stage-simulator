@@ -88,5 +88,5 @@ xml.write('</OME>')
 skimage.io.imsave(
     str(output_path),
     np.array([ac.image for ac in acquisitions]),
-    description=xml.getvalue()
+    description=xml.getvalue().encode('utf-8')
 )
